@@ -18,8 +18,8 @@ def main():
             line = line.strip()
             parsed_line = parse_line(line)
             if parsed_line:
-                status_code, file_sizes = parsed_line
-                file_sizes.append(file_sizes)
+                status_code, file_size = parsed_line
+                file_sizes.append(file_size)
                 status_counts[status_code] += 1
                 lines_processed += 1
                 if lines_processed % 10 == 0:
@@ -31,17 +31,16 @@ def main():
 def parse_line(line):
     """
     Parses the input from stdin
-    Args:
-        line(str): Format is <IP Address> - [<date>] "GET /projects/260 HTTP/1.1" <status code> <file size>
     """
-    parts = line.split()
-    if len(parts) != 9 or parts[6] not in ['200', '301', '400', '401', '403', '404', '405', '500']:
+    parts = line.split(' ')
+    if len(parts) != 9 or parts[7]\
+            not in ['200', '301', '400', '401', '403', '404', '405', '500']:
         return None
     try:
         file_size = int(parts[8])
     except ValueError:
         return None
-    return parts[6], file_size
+    return parts[7], file_size
 
 
 def print_statistics(file_sizes, status_counts):
