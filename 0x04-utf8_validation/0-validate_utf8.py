@@ -7,25 +7,26 @@ UTF-8 Validation
 def validUTF8(data):
     """
     """
-    isUTF = []
-    for d in data:
-        bin_rep = bin(d)[2:]
-        if d >= 0 and d < 128:
-            if bin_rep[0] == 0 or len(bin_rep) < 8:
-                # print("UTF-8, 1 byte")
-                isUTF.append(True)
+    num_bytes_to_follow = 0
+
+    for num in data:
+        # Check if the number is a valid UTF-8 start byte
+        if num_bytes_to_follow == 0:
+            if num & 0x80 == 0:  # Single-byte character (0xxxxxxx)
+                continue
+            elif num & 0xE0 == 0xC0:  # Two-byte character (110xxxxx)
+                num_bytes_to_follow = 1
+            elif num & 0xF0 == 0xE0:  # Three-byte character (1110xxxx)
+                num_bytes_to_follow = 2
+            elif num & 0xF8 == 0xF0:  # Four-byte character (11110xxx)
+                num_bytes_to_follow = 3
             else:
-                isUTF.append(False)
-        if d >= 128 and d < 2048:
-            l_significant = bin_rep[-8:]
-            if l_significant[0] == 1 and l_significant[1] == 0:
-                # print("UTF-8, 2,3,4 bytes")
-                isUTF.append(True)
-            else:
-                isUTF.append(False)
-    if False not in isUTF:
-        # print(isUTF)
-        return True
-    else:
-        # print(isUTF)
-        return False
+                return False
+        else:
+            # Check if the number is a valid UTF-8 follow byte (10xxxxxx)
+            if num & 0xC0 != 0x80:
+                return False
+
+            num_bytes_to_follow -= 1
+
+    return num_bytes_to_follow == 0
