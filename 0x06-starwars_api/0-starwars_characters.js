@@ -24,7 +24,6 @@ request(apiUrl, (error, response, body) => {
         console.log('No characters found for this movie.');
         return;
     }
-    console.log(`Characters in "${filmData.title}":`);
     fetchAndPrintCharacters(charactersUrls, 0);
 });
 
